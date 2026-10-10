@@ -21,7 +21,7 @@
       </span>
     </div>
 
-    <!-- Kotak Ringkasan Kas -->
+    <!-- Ringkasan Kas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
         <p class="text-xs text-slate-400 mb-1">Total Pemasukan</p>
@@ -64,9 +64,8 @@
   </div>
 
   <script>
-    // MASUKKAN KREDENSIAL SUPABASE MILIKMU DI BAWAH INI:
     const SUPABASE_URL = "https://mrtxwbbjpbidhphwpmqq.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ydHh3YmJqcGJpZGhwaHdwbXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1OTY2MTUsImV4cCI6MjEwNzE3MjYxNX0.m9v31k_jXgnmo7Epg0XHimijkBs235peVKUB-LVv2no"; // Tempel anon key panjangmu di sini
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ydHh3YmJqcGJpZGhwaHdwbXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1OTY2MTUsImV4cCI6MjEwNzE3MjYxNX0.m9v31k_jXgnmo7Epg0XHimijkBs235peVKUB-LVv2no"; // Masukkan anon key Supabase milikmu
 
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
