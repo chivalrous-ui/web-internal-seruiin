@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Internal - SERUIIN.ID</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8 font-sans">
+  <div class="max-w-4xl mx-auto space-y-6">
+    
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">SERUIIN.ID</h1>
+        <p class="text-xs text-slate-400">Dashboard Mutasi Kas & Keuangan Internal</p>
+      </div>
+      <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-xs font-medium">
+        ● Live Connected
+      </span>
+    </div>
+
+    <!-- Kotak Ringkasan Kas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+        <p class="text-xs text-slate-400 mb-1">Total Pemasukan</p>
+        <p id="total-income" class="text-xl font-bold text-emerald-400">Rp 0</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+        <p class="text-xs text-slate-400 mb-1">Total Pengeluaran</p>
+        <p id="total-expense" class="text-xl font-bold text-rose-400">Rp 0</p>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+        <p class="text-xs text-slate-400 mb-1">Saldo Kas Riil</p>
+        <p id="net-balance" class="text-xl font-bold text-white">Rp 0</p>
+      </div>
+    </div>
+
+    <!-- Tabel Mutasi -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+      <div class="p-4 border-b border-slate-800">
+        <h2 class="font-semibold text-sm text-white">Catatan Transaksi Terbaru</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-800/50 text-slate-400 uppercase border-b border-slate-800">
+            <tr>
+              <th class="p-3">Tanggal</th>
+              <th class="p-3">Keterangan</th>
+              <th class="p-3">Kategori</th>
+              <th class="p-3 text-right">Nominal</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-rows" class="divide-y divide-slate-800 font-mono">
+            <tr>
+              <td colspan="4" class="p-6 text-center text-slate-500">Memuat data dari database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // MASUKKAN KREDENSIAL SUPABASE MILIKMU DI BAWAH INI:
+    const SUPABASE_URL = "https://mrtxwbbjpbidhphwpmqq.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ydHh3YmJqcGJpZGhwaHdwbXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1OTY2MTUsImV4cCI6MjEwNzE3MjYxNX0.m9v31k_jXgnmo7Epg0XHimijkBs235peVKUB-LVv2no"; // Tempel anon key panjangmu di sini
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadData() {
+      const { data, error } = await client
+        .from('cashflow_transactions')
+        .select('*')
+        .order('transaction_date', { ascending: false });
+
+      if (error) {
+        alert("Gagal memuat data: " + error.message);
+        return;
+      }
+
+      let inc = 0, exp = 0;
+      const rows = data.map(item => {
+        const val = Number(item.amount);
+        if (item.type === 'income') inc += val;
+        else exp += val;
+
+        const isInc = item.type === 'income';
+        const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val);
+
+        return `
+          <tr class="hover:bg-slate-800/40">
+            <td class="p-3 text-slate-400">${item.transaction_date || '-'}</td>
+            <td class="p-3 font-sans text-slate-200">${item.description}</td>
+            <td class="p-3"><span class="bg-slate-800 px-2 py-0.5 rounded text-[10px] text-slate-400">${item.category}</span></td>
+            <td class="p-3 text-right font-medium ${isInc ? 'text-emerald-400' : 'text-rose-400'}">
+              ${isInc ? '+' : '-'} ${formatted}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('transaction-rows').innerHTML = rows || '<tr><td colspan="4" class="p-6 text-center text-slate-500">Belum ada transaksi</td></tr>';
+
+      const fmt = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n);
+      document.getElementById('total-income').innerText = fmt(inc);
+      document.getElementById('total-expense').innerText = fmt(exp);
+      document.getElementById('net-balance').innerText = fmt(inc - exp);
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
